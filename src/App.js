@@ -1,6 +1,7 @@
 import React from 'react'
 // import * as BooksAPI from './BooksAPI'
 import './App.css'
+import BookCollection from './components/BookCollection';
 
 class BooksApp extends React.Component {
   state = {
@@ -16,6 +17,7 @@ class BooksApp extends React.Component {
   render() {
     return (
       <div className="app">
+        <BookCollection collectionTitle={"Currently Reading"} />
         {this.state.showSearchPage ? (
           <div className="search-books">
             <div className="search-books-bar">
