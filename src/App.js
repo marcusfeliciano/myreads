@@ -56,6 +56,13 @@ const mockBooks = {
     }
   ]
 };
+export const AppChanels = {
+  BOOK_CHANEL : 'BOOK_CHANEL'
+}
+export const AppEvents = {
+    BOOK_ADDING : 'BOOK_ADDING',
+    BOOK_ADDED : 'BOOK_ADDED'
+}
 const BooksApp = () => {
   return (
     <div className="app">
