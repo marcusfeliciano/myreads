@@ -37,8 +37,9 @@ class AddBook extends Component {
                         {this.state.results.map(book =>
                             <Book
                                 key={book.id}
-                                book={book}
-                                onAddToShelf={this.changeShelf} />
+                                book={book}>
+                                <BookShelfAdd book={this.book} onAddToShelf={ this.changeShelf } />
+                            </Book>
                         )}
                     </ol>
                 </div>

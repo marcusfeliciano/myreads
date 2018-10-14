@@ -23,13 +23,13 @@ class Book extends Component {
     }
 
     render() { 
-        const { onAddToShelf } = this.props;
+        const { onAddToShelf, children } = this.props;
         return (
             <li>
                 <div className="book">
                     <div className="book-top">
                         <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url("${this.image}")` }}></div>
-                        <BookShelfAdd book={this.book} onAddToShelf={ onAddToShelf } />
+                        {children}
                     </div>
                     <div className="book-title">{this.formatedTitle}</div>
                     <div className="book-authors">{this.bookAuthors}</div>
