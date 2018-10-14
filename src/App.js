@@ -1,9 +1,9 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-import * as BooksService from './services/BooksService';
+
 import './App.css'
-import Search from './components/Search';
-import MainPage from './components/MainPage';
+import AddBook from './components/AddBook';
+import Shelfs from './components/Shelfs';
 
 const mockBooks = {
   currentlyReading: [
@@ -56,35 +56,13 @@ const mockBooks = {
     }
   ]
 };
-class BooksApp extends React.Component {
-  state = {
-      shelfs:{}
-  }
-
-  componentDidMount() {
-    this.loadShelfs();
-  }
-
-  loadShelfs = () => {
-    BooksService.shelfsWithBooks().then(shelfs => {
-      this.setState(()=>({shelfs:shelfs}));
-    });
-  }
-
-  changeShelf = (book, shelf) => {
-      BooksService.changeShelf(book, shelf)
-      .then(()=> this.loadShelfs());
-  }
-
-  render() {
-    const { shelfs } = this.state;
-    return (
-      <div className="app">
-        <Route exact path='/' render={() => <MainPage shelfs={shelfs} onShelfChange={this.changeShelf} />} />
-        <Route path='/search' component={Search} />
-      </div>
-    )
-  }
+const BooksApp = () => {
+  return (
+    <div className="app">
+      <Route exact path='/' render={() => <Shelfs />} />
+      <Route path='/search' render={() => <AddBook />} />
+    </div>
+  )
 }
 
 export default BooksApp

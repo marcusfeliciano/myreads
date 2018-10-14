@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-class BookShelfChanger extends Component {
+class BookShelfAdd extends Component {
     state = {
         value:''
     }
@@ -10,7 +10,7 @@ class BookShelfChanger extends Component {
             value : value
         }))
         
-        this.props.onShelfChange(this.props.book, value);
+        this.props.onAddToShelf(this.props.book, value);
     }
     render() {
         return (
@@ -27,4 +27,4 @@ class BookShelfChanger extends Component {
     }
 }
 
-export default BookShelfChanger;
+export default BookShelfAdd;

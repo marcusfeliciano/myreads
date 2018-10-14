@@ -8,20 +8,36 @@ const provider = () => {
 export const shelfsWithBooks = () => {
     return new Promise((resolve, reject) => {
         const shelfs = {
-            currentlyReading: {title: 'Currently Reading', books: []},
-            wantToRead: {title: 'Want to Read', books: []},
-            read: {title: 'Read', books: []},
+            currentlyReading: { title: 'Currently Reading', books: [] },
+            wantToRead: { title: 'Want to Read', books: [] },
+            read: { title: 'Read', books: [] },
         };
         provider().getAll().then(books => {
             console.log('recived', books)
-            books.forEach(book=>{
+            books.forEach(book => {
                 shelfs[book.shelf].books.push(book);
             });
             resolve(shelfs);
         }).catch(err => reject('Can\'t resolve.'));
-    })    
+    })
 }
 
 export const changeShelf = (book, shelf) => {
     return provider().update(book, shelf);
+}
+
+export const search = (term) => {
+    return new Promise((resolve, reject) => {
+        provider().search(term).then((result) => {
+            console.log(result)
+            const books = result.hasOwnProperty('error')
+                ? []
+                : result;
+            resolve(books)
+        })
+            .catch(err => {
+                console.log('erro ao recuperar', err)
+                reject([])
+            });
+    });
 }

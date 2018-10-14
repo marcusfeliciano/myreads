@@ -1,12 +1,36 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import BookShelf from './BookShelf';
 
-class MainPage extends Component {
-    getShelfsList = () => {
-        return Object.keys(this.props.shelfs)
+import * as BooksService from '../services/BooksService';
+
+class Shelfs extends Component {
+    state = {
+        shelfs: {}
     }
+
+    componentDidMount() {
+        this.loadShelfs();
+    }
+
+    loadShelfs = () => {
+        BooksService.shelfsWithBooks().then(shelfs => {
+            this.setState(() => ({ shelfs: shelfs }));
+        });
+    }
+
+    changeShelf = (book, shelf) => {
+        BooksService.changeShelf(book, shelf)
+            .then(() => this.loadShelfs());
+    }
+
+
+    getShelfsList = () => {
+        return Object.keys(this.state.shelfs)
+    }
+
     render() {
-        const { shelfs, onShelfChange } = this.props;
+        const { shelfs } = this.state;
         return (
             <div className="list-books">
                 <div className="list-books-title">
@@ -16,18 +40,18 @@ class MainPage extends Component {
                     <div>
                         {
                             this.getShelfsList().map(shelf => <BookShelf
-                                onShelfChange={onShelfChange}
+                                onAddToShelf={this.changeShelf}
                                 key={shelf}
                                 shelf={shelfs[shelf]} />)
                         }
                     </div>
                 </div>
                 <div className="open-search">
-                    <a onClick={() => this.setState({ showSearchPage: true })}>Add a book</a>
+                    <Link to='/search'>Add a book</Link>
                 </div>
             </div>
         )
     }
 }
 
-export default MainPage;
+export default Shelfs;

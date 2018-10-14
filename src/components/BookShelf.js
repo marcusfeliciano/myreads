@@ -4,12 +4,12 @@ import BookList from './BookList';
 class BookShelf extends Component {
 
     render() {
-        const { shelf, onShelfChange } = this.props;
+        const { shelf, onAddToShelf } = this.props;
 
         return (
             <div className="bookshelf">
                 <h2 className="bookshelf-title">{shelf.title}</h2>
-                <BookList onShelfChange={onShelfChange} collection={shelf.books} />
+                <BookList onAddToShelf={onAddToShelf} collection={shelf.books} />
             </div>
         );
     }
