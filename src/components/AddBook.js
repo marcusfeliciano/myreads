@@ -4,13 +4,30 @@ import { Dimmer, Loader, Segment } from 'semantic-ui-react';
 
 import * as BooksService from '../services/BooksService';
 import Search from './Search';
-import Book from './Book';
+import CardBook from './CardBook';
+
+import { AppChanels, AppEvents } from '../App';
+import PubSub from 'pubsub-js';
+
 
 class AddBook extends Component {
     state = {
         search: '',
-        isSearching:false,
+        isSearching: false,
         results: []
+    }
+
+    subscribe = null;
+
+    componentDidMount = () => {
+        this.subscribe = PubSub.subscribe(AppChanels.SHELF_CHANEL, (chanel, event) => {
+            const { bundle } = event;
+            this.changeShelf(bundle.book, bundle.shelf);
+        });
+    }
+
+    componentWillUnmount = () => {
+        PubSub.unsubscribe(this.subscribe);
     }
 
     setResultList = (list) => this.setState((prev) => ({ results: list }));
@@ -31,11 +48,15 @@ class AddBook extends Component {
 
     get isSearching() {
         return this.state.isSearching
-    }    
+    }
 
-    changeShelf = (book, shelf) =>
+    changeShelf = (book, shelf) => {
+        PubSub.publish(AppChanels.BOOK_CHANEL, { type: AppEvents.BOOK_ADDING, book });
         BooksService.changeShelf(book, shelf)
-            .then();
+            .then(() => {
+                PubSub.publish(AppChanels.BOOK_CHANEL, { type: AppEvents.BOOK_ADDED, book });
+            });
+    }
 
 
     render() {
@@ -47,17 +68,17 @@ class AddBook extends Component {
                     <Search onSearch={(query) => this.request(query)} />
                     <Loader active={this.isSearching} inline='centered' />
                 </div>
-
-
                 <div className="search-books-results">
                     <Segment>
-                        <Dimmer active={this.isSearching}><Loader /></Dimmer>
+                        <Dimmer active={this.isSearching}>
+                            <Loader />
+                        </Dimmer>
                         <ol className="books-grid">
                             {this.state.results.map(book =>
-                                <Book
-                                    onAddToShelf={this.changeShelf}
-                                    key={book.id}
-                                    book={book} />
+                                <li key={book.id}>
+                                    <CardBook
+                                        book={book} />
+                                </li>
                             )}
                         </ol>
                     </Segment>

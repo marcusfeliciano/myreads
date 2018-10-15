@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { Dropdown } from 'semantic-ui-react';
+import PubSub from 'pubsub-js';
+import { AppChanels, AppEvents } from '../App';
 
 const values = [
     //{'key':'move', 'value': 'Move to...', 'text': 'Move to...'},
@@ -7,7 +9,7 @@ const values = [
     {'key':'wantToRead', 'value': 'wantToRead', 'text': 'Want to Read'},
     {'key':'read', 'value': 'read', 'text': 'Read'}
 ];
-class BookShelfAdd extends Component {
+class BookShelfChooser extends Component {
     state = {
         value:''
     }
@@ -19,15 +21,23 @@ class BookShelfAdd extends Component {
             })) 
         }
     }
+
+    getEventBundle = ( shelf ) => {
+        const { book } = this.props;
+        return  {
+            type: AppEvents.SHELF_CHOOSED, 
+            bundle: { shelf, book }
+        };
+    }
+
     onChange = (e, { value }) => {
-        
-        console.log(value);
         this.setState(()=>({
             value : value
         }))
         
-        this.props.onAddToShelf(this.props.book, value);
+        PubSub.publish(AppChanels.SHELF_CHANEL, this.getEventBundle(value));
     }
+    
     render() {
         return (
             <div>
@@ -41,4 +51,4 @@ class BookShelfAdd extends Component {
     }
 }
 
-export default BookShelfAdd;
+export default BookShelfChooser;
