@@ -3,14 +3,14 @@ import { Link } from 'react-router-dom';
 import { Dimmer, Loader, Segment } from 'semantic-ui-react';
 
 import * as BooksService from '../services/BooksService';
-import Search from './Search';
-import CardBook from './CardBook';
+import Search from '../components/Search';
+import CardBook from '../components/CardBook';
 
 import { AppChanels, AppEvents } from '../App';
 import PubSub from 'pubsub-js';
 
 
-class AddBook extends Component {
+class AddBookPage extends Component {
     state = {
         search: '',
         isSearching: false,
@@ -89,4 +89,4 @@ class AddBook extends Component {
     }
 }
 
-export default AddBook;
+export default AddBookPage;

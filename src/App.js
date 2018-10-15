@@ -1,9 +1,9 @@
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { Route, BrowserRouter } from 'react-router-dom';
 
 import './App.css'
-import AddBook from './components/AddBook';
-import Shelfs from './components/Shelfs';
+import AddBookPage from './pages/AddBookPage';
+import MyShelfsPage from './pages/MyShelfsPage';
 
 
 
@@ -23,8 +23,12 @@ export const AppEvents = {
 const BooksApp = () => {
   return (
     <div className="app">
-      <Route exact path='/' render={() => <Shelfs />} />
-      <Route path='/search' render={() => <AddBook />} />
+      <BrowserRouter>
+        <div>
+          <Route exact path='/' render={() => <MyShelfsPage />} />
+          <Route path='/search' render={() => <AddBookPage />} />
+        </div>
+      </BrowserRouter>
     </div>
   )
 }

@@ -5,7 +5,8 @@ class Search extends Component {
     state = {
         search:''
     }
-    
+
+    intervalId = null
 
     get search() {
         return this.state.search;
@@ -19,7 +20,14 @@ class Search extends Component {
             if(search.trim().length < 3){
                 return;
             }
-            this.props.onSearch(search.trim());
+            if(this.intervalId !== null ){
+                clearInterval(this.intervalId);
+                this.intervalId = null;
+            }
+            this.intervalId = setTimeout(() => {
+                this.props.onSearch(search.trim());
+            }, 800)
+            
         });
     }
 

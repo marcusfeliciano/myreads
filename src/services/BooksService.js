@@ -13,7 +13,6 @@ export const shelfsWithBooks = () => {
             read: { title: 'Read', books: [] },
         };
         provider().getAll().then(books => {
-            console.log('recived', books)
             books.forEach(book => {
                 shelfs[book.shelf].books.push(book);
             });
@@ -27,9 +26,10 @@ export const changeShelf = (book, shelf) => {
 }
 
 export const search = (term) => {
-    return new Promise((resolve, reject) => {
+    
+
+    const promise = new Promise((resolve, reject) => {
         provider().search(term).then((result) => {
-            console.log(result)
             const books = result.hasOwnProperty('error')
                 ? []
                 : result;
@@ -40,4 +40,6 @@ export const search = (term) => {
                 reject([])
             });
     });
+    
+    return promise;
 }
