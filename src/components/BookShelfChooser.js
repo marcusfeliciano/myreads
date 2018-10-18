@@ -15,7 +15,7 @@ class BookShelfChooser extends Component {
     }
     componentDidMount = () => {
         const { book } = this.props;
-        if(book.hasOwnProperty('shelf')){
+        if(book && book.hasOwnProperty('shelf')){
             this.setState(() => ({
                 value:book.shelf
             })) 

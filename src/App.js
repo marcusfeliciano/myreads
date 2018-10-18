@@ -8,6 +8,7 @@ import MyShelfsPage from './pages/MyShelfsPage';
 
 
 export const AppChanels = {
+  BOOK_COLLECT_CHANEL: 'BOOK_COLLECT_CHANEL',
   BOOK_CHANEL: 'BOOK_CHANEL',
   SHELF_CHANEL: 'SHELF_CHANEL'
 }

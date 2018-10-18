@@ -5,6 +5,7 @@ import { Dimmer, Loader, Segment } from 'semantic-ui-react';
 import * as BooksService from '../services/BooksService';
 import Search from '../components/Search';
 import CardBook from '../components/CardBook';
+import BookShelfChooser from '../components/BookShelfChooser';
 
 import { AppChanels, AppEvents } from '../App';
 import PubSub from 'pubsub-js';
@@ -14,6 +15,7 @@ class AddBookPage extends Component {
     state = {
         search: '',
         isSearching: false,
+        selectedBooks:[],
         results: []
     }
 
@@ -24,6 +26,23 @@ class AddBookPage extends Component {
             const { bundle } = event;
             this.changeShelf(bundle.book, bundle.shelf);
         });
+        PubSub.subscribe(AppChanels.BOOK_CHANEL,(chanel, event) => {
+            const { book } = event.bundle;
+            this.setState((prev) => {
+                if(event.type === AppEvents.BOOK_SELECTED){
+                    if(!prev.selectedBooks.includes(book.id)){
+                        return ({selectedBooks:[...prev.selectedBooks, book.id]});
+                    }
+                    return ({selectedBooks:[...prev.selectedBooks]});
+                }
+                return ({selectedBooks:prev.selectedBooks.filter( b => b !== book.id)});
+                
+            }, () => {
+                PubSub.publish(AppChanels.BOOK_COLLECT_CHANEL, {type:null, bundle : {
+                    selectedBooks: this.state.selectedBooks
+                }});
+            });
+        })
     }
 
     componentWillUnmount = () => {
@@ -65,7 +84,13 @@ class AddBookPage extends Component {
             <div className="search-books">
                 <div className="search-books-bar">
                     <Link to='/' className="close-search">Close</Link>
-                    <Search onSearch={(query) => this.request(query)} />
+                    {(this.state.selectedBooks.length === 0 && (
+                        <Search onSearch={(query) => this.request(query)} />))} 
+                    {(this.state.selectedBooks.length !== 0 && (
+                        <div>
+                            <BookShelfChooser shelf={null} book={null} />
+                        </div>
+                        ))} 
                     <Loader active={this.isSearching} inline='centered' />
                 </div>
                 <div className="search-books-results">

@@ -13,23 +13,33 @@ class CardBook extends Component {
 
     componentDidMount() {
         this.subscriberToken = PubSub.subscribe(AppChanels.BOOK_CHANEL, this.subscriber);
+        PubSub.subscribe(AppChanels.BOOK_COLLECT_CHANEL, (chanel, event) => {
+            const hasBookSelected = event.bundle.selectedBooks.length > 0;            
+            this.setState(() => ({hasBookSelected:hasBookSelected}));
+        });
     }
 
     componentWillUnmount() {
         PubSub.unsubscribe(this.subscriberToken);
+        
     }
 
     subscriber = (chanel, event) => {
         const isCurrentBook = this.props.book.id === event.bundle.book.id;
-        
+        const containsEvents = [
+            AppEvents.BOOK_ADDING, AppEvents.BOOK_ADDED
+        ].filter(e => e === event.type).length > 0;
+
+        if(!containsEvents){
+            return false;
+        }
+
         if (!isCurrentBook) {
             //return false;
         }
         const stateFromEventType = {
             [AppEvents.BOOK_ADDING] : { loading: true },
-            [AppEvents.BOOK_ADDED] : { loading: false },
-            [AppEvents.BOOK_SELECTED] : { hasBookSelected: true },
-            [AppEvents.BOOK_UNSELECTED] : { hasBookSelected: false },
+            [AppEvents.BOOK_ADDED] : { loading: false }
         };        
         this.setState(() => (stateFromEventType[event.type]));
     }
