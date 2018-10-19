@@ -25,8 +25,11 @@ export const changeShelf = (book, shelf) => {
     return provider().update(book, shelf);
 }
 
-export const search = (term) => {
-    
+export const addBooksCollectionToShelf = (books, shelf) => {
+    return provider().updateCollection(books, shelf);
+}
+
+export const search = (term) => {    
 
     const promise = new Promise((resolve, reject) => {
         provider().search(term).then((result) => {

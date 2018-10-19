@@ -31,6 +31,14 @@ export const update = (book, shelf) =>
     },
     body: JSON.stringify({ shelf })
   }).then(res => res.json())
+/**
+ * 
+ * @param {array} books 
+ * @param {string} shelf 
+ */
+export const updateCollection = (books, shelf) => {  
+  return Promise.all(books.map(book => this.update(book, shelf)));
+}
 
 export const search = (query) =>
   fetch(`${api}/search`, {
