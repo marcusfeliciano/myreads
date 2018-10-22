@@ -11,6 +11,7 @@ import PubSub from 'pubsub-js';
 
 
 
+
 class AddBookPage extends Component {
     state = {
         search: '',
@@ -19,15 +20,16 @@ class AddBookPage extends Component {
         results: []
     }
 
-    subscribe = null;
+    shelfChanelToken = null;
+    bookChanel = null;
 
     componentDidMount = () => {
-        this.subscribe = PubSub.subscribe(AppChanels.SHELF_CHANEL, (chanel, event) => {
+        this.shelfChanelToken = PubSub.subscribe(AppChanels.SHELF_CHANEL, (chanel, event) => {
             const { bundle } = event;
             this.changeShelf(bundle.book, bundle.shelf);
         });
         
-        PubSub.subscribe(AppChanels.BOOK_CHANEL, (chanel, event) => {
+        this.bookChanel = PubSub.subscribe(AppChanels.BOOK_CHANEL, (chanel, event) => {
             const { book } = event.bundle;
             this.setState((prev) => {
                 if (event.type === AppEvents.BOOK_SELECTED) {
@@ -46,7 +48,9 @@ class AddBookPage extends Component {
     }
 
     componentWillUnmount = () => {
-        PubSub.unsubscribe(this.subscribe);
+        PubSub.unsubscribe(this.shelfChanelToken);
+        PubSub.unsubscribe(this.bookChanel);
+        
     }
 
     setResultList = (list) => {
@@ -57,17 +61,9 @@ class AddBookPage extends Component {
     }
 
     request = (query) => {
-        this.setSearchingLoader(true);
-        
-        BooksService.search(query)
-            .then(books => {
-                this.setSearchingLoader(false);
-                this.setResultList(books);
-            })
-            .catch(() => {
-                this.setSearchingLoader(false);
-                this.setResultList([]);
-            });
+        this.executeTaskWithLoading(BooksService.search(query))
+            .then(books => this.setResultList(books) )
+            .catch(() => this.setResultList([]) );
     }
     
 
@@ -79,17 +75,28 @@ class AddBookPage extends Component {
     }
 
     changeShelf = (book, shelf) => {
-        this.setSearchingLoader(true);
-        BooksService.changeShelf(book, shelf)
-            .then(() => {
-                this.setSearchingLoader(false);
-            });
+        this.executeTaskWithLoading(BooksService.changeShelf(book, shelf));
     }
 
     sendCollectionToShelf = (shelf) => {
+        this.executeTaskWithLoading(BooksService.addBooksCollectionToShelf(this.state.selectedBooks, shelf));
+    }
+
+    /**
+     * show loading when execute some task
+     */
+    executeTaskWithLoading = (promise) => {
         this.setSearchingLoader(true);
-        BooksService.addBooksCollectionToShelf(this.state.selectedBooks, shelf)
-            .then(()=>this.setSearchingLoader(false));
+        return new Promise((resolve, reject) => {
+            promise.then((result)=>{
+                this.setSearchingLoader(false);
+                resolve(result);
+            }).catch(err => {
+                this.setSearchingLoader(false);
+                reject(err);
+            });
+        })
+        
     }
 
 
