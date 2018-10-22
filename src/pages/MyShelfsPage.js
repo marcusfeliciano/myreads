@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button, Icon, Dimmer, Loader, Segment } from 'semantic-ui-react';
 import BookShelf from '../components/BookShelf';
 import PubSub from 'pubsub-js';
-import { AppChanels, AppEvents } from '../App';
+import { AppChanels } from '../App';
 
 import * as BooksService from '../services/BooksService';
 
@@ -32,13 +32,10 @@ class MyShelfsPage extends Component {
     }
 
     changeShelf = (book, shelf) => {
-        const bundle = { bundle: { book } };
-        //PubSub.publish(AppChanels.BOOK_CHANEL, { type: AppEvents.BOOK_ADDING, bundle });
         this.inLoading(true);
         BooksService.changeShelf(book, shelf)
             .then(() => {
                 this.inLoading(false);
-                //PubSub.publish(AppChanels.BOOK_CHANEL, { type: AppEvents.BOOK_ADDED, bundle });
                 this.loadShelfs();
             });
     }
@@ -55,12 +52,12 @@ class MyShelfsPage extends Component {
         const { shelfs } = this.state;
         return (
             <div>
-                <div className="ui fixed inverted menu">
-                    <div className="ui container">
-                        <span className="header item">
+                <div className="ui menu fixed inverted">
+                    <div className="ui three column stackable grid container"  style={{margin:0}}>
+                        <Link to='/' className="item three wide column">
                             <Icon name='book' size='big' />
                             MyReads
-                        </span>
+                        </Link>
                     </div>
                 </div>
                 <div className="list-books">

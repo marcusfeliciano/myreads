@@ -1,21 +1,21 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import { Dimmer, Loader, Segment } from 'semantic-ui-react';
 
 import * as BooksService from '../services/BooksService';
 import Search from '../components/Search';
 import CardBook from '../components/CardBook';
-import BookShelfChooser from '../components/BookShelfChooser';
+import SendCollectToShelf from '../components/SendCollectToShelf';
 
 import { AppChanels, AppEvents } from '../App';
 import PubSub from 'pubsub-js';
+
 
 
 class AddBookPage extends Component {
     state = {
         search: '',
         isSearching: false,
-        selectedBooks:[],
+        selectedBooks: [],
         results: []
     }
 
@@ -26,21 +26,21 @@ class AddBookPage extends Component {
             const { bundle } = event;
             this.changeShelf(bundle.book, bundle.shelf);
         });
-        PubSub.subscribe(AppChanels.BOOK_CHANEL,(chanel, event) => {
+        
+        PubSub.subscribe(AppChanels.BOOK_CHANEL, (chanel, event) => {
             const { book } = event.bundle;
             this.setState((prev) => {
-                if(event.type === AppEvents.BOOK_SELECTED){
-                    if(!prev.selectedBooks.includes(book.id)){
-                        return ({selectedBooks:[...prev.selectedBooks, book.id]});
-                    }
-                    return ({selectedBooks:[...prev.selectedBooks]});
+                if (event.type === AppEvents.BOOK_SELECTED) {
+                    return ({ selectedBooks: [...prev.selectedBooks, book] });
                 }
-                return ({selectedBooks:prev.selectedBooks.filter( b => b !== book.id)});
-                
+                return ({ selectedBooks: prev.selectedBooks.filter(b => b.id !== book.id) });
+
             }, () => {
-                PubSub.publish(AppChanels.BOOK_COLLECT_CHANEL, {type:null, bundle : {
-                    selectedBooks: this.state.selectedBooks
-                }});
+                PubSub.publish(AppChanels.BOOK_COLLECT_CHANEL, {
+                    type: null, bundle: {
+                        selectedBooks: this.state.selectedBooks
+                    }
+                });
             });
         })
     }
@@ -49,32 +49,47 @@ class AddBookPage extends Component {
         PubSub.unsubscribe(this.subscribe);
     }
 
-    setResultList = (list) => this.setState((prev) => ({ results: list }));
-    setSearchingLoader = (searching) => this.setState((prev) => ({ isSearching: searching }));
+    setResultList = (list) => {
+        this.setState((prev) => ({ results: list }));
+    }
+    setSearchingLoader = (searching) => {
+        this.setState((prev) => ({ isSearching: searching }));
+    }
 
     request = (query) => {
         this.setSearchingLoader(true);
+        
         BooksService.search(query)
             .then(books => {
                 this.setSearchingLoader(false);
-                this.setResultList(books)
+                this.setResultList(books);
             })
             .catch(() => {
                 this.setSearchingLoader(false);
-                this.setResultList([])
+                this.setResultList([]);
             });
     }
+    
 
     get isSearching() {
-        return this.state.isSearching
+        return this.state.isSearching;
+    }
+    get hasSelectedBooks () {
+        return this.state.selectedBooks.length !== 0;
     }
 
     changeShelf = (book, shelf) => {
-        PubSub.publish(AppChanels.BOOK_CHANEL, { type: AppEvents.BOOK_ADDING, book });
+        this.setSearchingLoader(true);
         BooksService.changeShelf(book, shelf)
             .then(() => {
-                PubSub.publish(AppChanels.BOOK_CHANEL, { type: AppEvents.BOOK_ADDED, book });
+                this.setSearchingLoader(false);
             });
+    }
+
+    sendCollectionToShelf = (shelf) => {
+        this.setSearchingLoader(true);
+        BooksService.addBooksCollectionToShelf(this.state.selectedBooks, shelf)
+            .then(()=>this.setSearchingLoader(false));
     }
 
 
@@ -82,17 +97,21 @@ class AddBookPage extends Component {
 
         return (
             <div className="search-books">
-                <div className="search-books-bar">
-                    <Link to='/' className="close-search">Close</Link>
-                    {(this.state.selectedBooks.length === 0 && (
-                        <Search onSearch={(query) => this.request(query)} />))} 
-                    {(this.state.selectedBooks.length !== 0 && (
-                        <div>
-                            <BookShelfChooser shelf={null} book={null} />
-                        </div>
-                        ))} 
-                    <Loader active={this.isSearching} inline='centered' />
+                <div className="ui menu fixed inverted">
+                {
+                    (!this.hasSelectedBooks && (
+                        <Search loading={this.state.isSearching} onSearch={(query) => this.request(query)} />
+                    ))
+                }
+                {
+                    (this.hasSelectedBooks && (
+                        <SendCollectToShelf
+                            onSelectShelf={this.sendCollectionToShelf}
+                            selectedBooks={this.state.selectedBooks} />
+                    ))
+                }
                 </div>
+                
                 <div className="search-books-results">
                     <Segment>
                         <Dimmer active={this.isSearching}>
@@ -113,5 +132,6 @@ class AddBookPage extends Component {
         );
     }
 }
+
 
 export default AddBookPage;

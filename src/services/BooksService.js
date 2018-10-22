@@ -4,6 +4,12 @@ import * as BooksAPI from '../api/BooksAPI';
 const provider = () => {
     return BooksAPI;
 }
+export const SHELF_LIST = [
+    //{'key':'move', 'value': 'Move to...', 'text': 'Move to...'},
+    {'key':'currentlyReading', 'value': 'currentlyReading', 'text': 'Currently Reading'},
+    {'key':'wantToRead', 'value': 'wantToRead', 'text': 'Want to Read'},
+    {'key':'read', 'value': 'read', 'text': 'Read'}
+];
 
 export const shelfsWithBooks = () => {
     return new Promise((resolve, reject) => {

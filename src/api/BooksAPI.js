@@ -37,7 +37,7 @@ export const update = (book, shelf) =>
  * @param {string} shelf 
  */
 export const updateCollection = (books, shelf) => {  
-  return Promise.all(books.map(book => this.update(book, shelf)));
+  return Promise.all(books.map(book => update(book, shelf)));
 }
 
 export const search = (query) =>

@@ -5,22 +5,24 @@ import PubSub from 'pubsub-js';
 import { AppChanels, AppEvents } from '../App';
 
 class CardBook extends Component {
-    subscriberToken = null;    
+    bookChanelToken = null;
+    bookCollectChanelToken = null;
     state = {
         loading: false,
         hasBookSelected: false
     }
 
     componentDidMount() {
-        this.subscriberToken = PubSub.subscribe(AppChanels.BOOK_CHANEL, this.subscriber);
-        PubSub.subscribe(AppChanels.BOOK_COLLECT_CHANEL, (chanel, event) => {
+        this.bookChanelToken = PubSub.subscribe(AppChanels.BOOK_CHANEL, this.subscriber);
+        this.bookCollectChanelToken = PubSub.subscribe(AppChanels.BOOK_COLLECT_CHANEL, (chanel, event) => {
             const hasBookSelected = event.bundle.selectedBooks.length > 0;            
             this.setState(() => ({hasBookSelected:hasBookSelected}));
         });
     }
 
     componentWillUnmount() {
-        PubSub.unsubscribe(this.subscriberToken);
+        PubSub.unsubscribe(this.bookChanelToken);
+        PubSub.unsubscribe(this.bookCollectChanelToken);
         
     }
 
