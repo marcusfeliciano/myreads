@@ -97,8 +97,7 @@ class MyShelfsPage extends Component {
                             {
                                 this.getShelfsList().map(shelf =>
                                     <BookShelf
-                                        blocked={this.blockShelf(shelf)}
-                                        onAddToShelf={this.changeShelf}
+                                        blocked={this.blockShelf(shelf)}                                        
                                         key={shelf}
                                         shelf={shelfs[shelf]} />)
                             }
