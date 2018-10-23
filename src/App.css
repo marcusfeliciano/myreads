@@ -50,6 +50,7 @@ body, .app {
   position: fixed;
   right: 25px;
   bottom: 25px;
+  z-index: 10000;
 }
 
 
@@ -162,4 +163,8 @@ body, .app {
   padding: 20px 10px 0;
   text-align: center;
   font-size: 0.8em;
+}
+
+.ui.menu.fixed {
+  z-index: 10000;
 }
