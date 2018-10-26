@@ -7,9 +7,11 @@ import { AppChanels, AppEvents } from '../App';
 class CardBook extends Component {
     bookChanelToken = null;
     bookCollectChanelToken = null;
+    
     state = {
         loading: false,
-        hasBookSelected: false
+        hasBookSelected: false,
+        checked: false
     }
 
     componentDidMount() {
@@ -23,30 +25,30 @@ class CardBook extends Component {
     componentWillUnmount() {
         PubSub.unsubscribe(this.bookChanelToken);
         PubSub.unsubscribe(this.bookCollectChanelToken);
-        
+        this.publish(false);
+    }
+
+    subscribeBookChanel = (chanel, event) => {
+        if(event.type !== AppEvents.BOOK_ADDED){
+            return;
+        }
+        this.setState(()=>({checked:false}));
     }
 
     subscriber = (chanel, event) => {
-        const isCurrentBook = this.props.book.id === event.bundle.book.id;
-        const containsEvents = [
-            AppEvents.BOOK_ADDING, AppEvents.BOOK_ADDED
-        ].filter(e => e === event.type).length > 0;
-
-        if(!containsEvents){
+        if(event.type !== AppEvents.BOOK_ADDED){
             return false;
         }
-
-        if (!isCurrentBook) {
-            //return false;
-        }
-        const stateFromEventType = {
-            [AppEvents.BOOK_ADDING] : { loading: true },
-            [AppEvents.BOOK_ADDED] : { loading: false }
-        };        
-        this.setState(() => (stateFromEventType[event.type]));
+        this.setState(() => ({ loading: false, defaultChecked: false }));
     }
 
     selectBook = (event, { checked }) => {
+        
+        this.setState(()=>({checked:checked}));
+        this.publish(checked);
+    }
+
+    publish = (checked) => {
         PubSub.publish(AppChanels.BOOK_CHANEL, {
             type: checked ? AppEvents.BOOK_SELECTED : AppEvents.BOOK_UNSELECTED,
             bundle: { book: this.book }
@@ -105,7 +107,8 @@ class CardBook extends Component {
                         </Grid.Row>
                         <Grid.Row>
                             <Grid.Column>
-                                <Checkbox label='Choose to send...' onChange={this.selectBook} />
+                                <Checkbox label='Choose to send...' 
+                                    checked={this.state.checked} onChange={this.selectBook} />
                             </Grid.Column>
                         </Grid.Row>
                         <Grid.Row>

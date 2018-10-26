@@ -5,7 +5,7 @@ import BookShelf from '../components/BookShelf';
 import BookCollectionEvents from '../components/BookCollectionEvents';
 import MyShelfsToolBar from '../components/MyShelfsToolBar';
 
-import { AppChanels } from '../App';
+import { AppChanels, AppEvents } from '../App';
 import PubSub from 'pubsub-js';
 
 import * as BooksService from '../services/BooksService';
@@ -47,8 +47,15 @@ class MyShelfsPage extends Component {
     sendCollectionToShelf = (e, { value }) => {
         this.executeTaskWithLoading(BooksService.addBooksCollectionToShelf(this.state.selectedBooks, value))
             .then(() => {
+                this.publishThatBooksHasBeenAdded();
                 this.loadShelfs();
             });
+    }
+
+    publishThatBooksHasBeenAdded = () => {
+        PubSub.publish(AppChanels.BOOK_CHANEL,{
+            type: AppEvents.BOOK_ADDED, bundle: {}
+        });
     }
 
     /**

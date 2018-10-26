@@ -10,6 +10,7 @@ const values = [
     {'key':'read', 'value': 'read', 'text': 'Read'}
 ];
 class BookShelfChooser extends Component {
+    bookChanelToken = null
     state = {
         value:''
     }
@@ -20,6 +21,18 @@ class BookShelfChooser extends Component {
                 value:book.shelf
             })) 
         }
+        this.bookChanelToken = PubSub.subscribe(AppChanels.BOOK_CHANEL, this.subscribeBookChanel)
+    }
+
+    componentWillUnmount = () => {
+        PubSub.unsubscribe(this.bookChanelToken);
+    }
+
+    subscribeBookChanel = (chanel, event) => {
+        if(event.type !== AppEvents.BOOK_ADDED){
+            return;
+        }
+        this.setState(()=>({value:''}));
     }
 
     getEventBundle = ( shelf ) => {

@@ -31,7 +31,7 @@ class BookCollectionEvents extends Component {
             const { book } = event.bundle;
             if (event.type === AppEvents.BOOK_SELECTED) {
                 this.addBookToSelection(book);
-            } else {
+            } else if(event.type === AppEvents.BOOK_UNSELECTED) {
                 this.removeBookFromSelection(book);
             }            
         });
