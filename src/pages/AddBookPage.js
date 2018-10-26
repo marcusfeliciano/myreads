@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Dimmer, Loader, Segment } from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
+import { Dimmer, Loader, Segment, Icon } from 'semantic-ui-react';
 
 import * as BooksService from '../services/BooksService';
 import Search from '../components/Search';
@@ -12,7 +13,7 @@ import PubSub from 'pubsub-js';
 
 
 class AddBookPage extends Component {
-    
+
     bookCollectionToken = null;
 
     state = {
@@ -20,15 +21,15 @@ class AddBookPage extends Component {
         isSearching: false,
         selectedBooks: [],
         results: []
-    }    
+    }
 
     componentDidMount = () => {
         this.subscribeBookCollectionChanel();
     }
 
     subscribeBookCollectionChanel = () => {
-        this.bookCollectionToken = PubSub.subscribe(AppChanels.BOOK_COLLECT_CHANEL, (chanel, event) =>{
-            this.setState(()=>({selectedBooks:event.bundle.selectedBooks}))
+        this.bookCollectionToken = PubSub.subscribe(AppChanels.BOOK_COLLECT_CHANEL, (chanel, event) => {
+            this.setState(() => ({ selectedBooks: event.bundle.selectedBooks }))
         });
     }
 
@@ -88,18 +89,25 @@ class AddBookPage extends Component {
         return (
             <div className="search-books">
                 <div className="ui menu fixed inverted">
-                    {
+                    <div className="ui three column stackable grid container" style={{ margin: 0 }}>
+                        <Link to='/' className="item three wide column">
+                            <Icon name='book' size='big' />
+                            MyReads
+                        </Link>
+                        {
                         (!this.hasSelectedBooks && (
                             <Search loading={this.state.isSearching} onSearch={(query) => this.request(query)} />
                         ))
-                    }
-                    {
-                        (this.hasSelectedBooks && (
-                            <SendCollectToShelf
-                                onSelectShelf={this.sendCollectionToShelf}
-                                selectedBooks={this.state.selectedBooks} />
-                        ))
-                    }
+                        }
+                        {
+                            (this.hasSelectedBooks && (
+                                <SendCollectToShelf
+                                    onSelectShelf={this.sendCollectionToShelf}
+                                    selectedBooks={this.state.selectedBooks} />
+                            ))
+                        }                        
+                    </div>
+                   
                 </div>
 
                 <div className="search-books-results">
@@ -107,7 +115,7 @@ class AddBookPage extends Component {
                         <Dimmer active={this.isSearching}>
                             <Loader />
                         </Dimmer>
-                        <BookCollectionEvents  changeShelf={this.changeShelf}>
+                        <BookCollectionEvents changeShelf={this.changeShelf}>
                             <ol className="books-grid">
                                 {this.state.results.map(book =>
                                     <li key={book.id}>

@@ -19,11 +19,7 @@ class SendCollectToShelf extends Component {
     render() {
         const { selectedBooks } = this.props;
         return (
-            <div className="ui three column stackable grid container" style={{ margin: 0 }}>
-                <Link to='/' className="item three wide column">
-                    <Icon name='book' size='big' />
-                    MyReads
-                    </Link>
+            <React.Fragment>
                 <div className="item eight wide column">
                     <h3>{`Total of selected books ${selectedBooks.length}`}</h3>
                 </div>
@@ -34,7 +30,7 @@ class SendCollectToShelf extends Component {
                         value={this.state.value} 
                         onChange={this.onChange} />
                 </div>
-            </div>
+            </React.Fragment>
         );
     }
 }

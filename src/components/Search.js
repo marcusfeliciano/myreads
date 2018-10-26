@@ -34,20 +34,13 @@ class Search extends Component {
 
     render() {
         return (
-            <div className="ui three column stackable grid container" style={{ margin: 0 }}>
-                <Link to='/' className="item three wide column">
-                    <Icon name='book' size='big' />
-                    MyReads
-                </Link>
-                <div className="item ten wide column">
-                    <Input
-                        size='big'
-                        loading={this.props.loading}
-                        value={this.search}
-                        onChange={this.onChange}
-                        placeholder="Search by title or author" />
-
-                </div>
+            <div className="item ten wide column">
+                <Input
+                    size='big'
+                    loading={this.props.loading}
+                    value={this.search}
+                    onChange={this.onChange}
+                    placeholder="Search by title or author" />
             </div>
         );
     }

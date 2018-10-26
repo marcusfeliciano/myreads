@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Icon, Loader, Dimmer } from 'semantic-ui-react';
+import { Button, Icon, Loader, Dimmer, Dropdown } from 'semantic-ui-react';
 import BookShelf from '../components/BookShelf';
 import BookCollectionEvents from '../components/BookCollectionEvents';
+import MyShelfsToolBar from '../components/MyShelfsToolBar';
 
 import { AppChanels } from '../App';
 import PubSub from 'pubsub-js';
@@ -14,7 +15,7 @@ class MyShelfsPage extends Component {
 
     state = {
         shelfs: {},
-        inLoading: false,
+        inExecuteTask: false,
         selectedBooks: [],
     }
 
@@ -43,25 +44,50 @@ class MyShelfsPage extends Component {
             .then(() => this.loadShelfs());
     }
 
+    sendCollectionToShelf = (e, { value }) => {
+        this.executeTaskWithLoading(BooksService.addBooksCollectionToShelf(this.state.selectedBooks, value))
+            .then(() => {
+                this.loadShelfs();
+            });
+    }
+
     /**
      * show loading when execute some task
      */
     executeTaskWithLoading = (promise) => {
-        this.inLoading(true);
+        this.inExecuteTask = true;
         return new Promise((resolve, reject) => {
             promise.then((result) => {
-                this.inLoading(false);
+                this.inExecuteTask = false;
                 resolve(result);
             }).catch(err => {
-                this.inLoading(false);
+                this.inExecuteTask = false;
                 reject(err);
             });
         })
 
     }
+    get selectedBooks() {
+        return this.state.selectedBooks;
+    }
+    get inExecuteTask() {
+        return this.state.inExecuteTask;
+    }
 
-    inLoading = (state) => {
-        this.setState(() => ({ inLoading: state }))
+    get hasSelectedBooks() {
+        return this.state.selectedBooks.length !== 0;
+    }
+ 
+    get listToShelf() {
+        if(!this.hasSelectedBooks) {
+            return [];
+        }
+        const shelf = this.state.selectedBooks[0].shelf;
+        return BooksService.SHELF_LIST.filter(i => i.value !== shelf);
+    }
+
+    set inExecuteTask(state){
+        this.setState(() => ({ inExecuteTask: state }))
     }
 
     getShelfsList = () => {
@@ -70,34 +96,26 @@ class MyShelfsPage extends Component {
 
     blockShelf = (shelf) => {
         const { selectedBooks } = this.state;
-        return selectedBooks.length && selectedBooks[0].shelf !== shelf;
+        return (selectedBooks.length && selectedBooks[0].shelf !== shelf) || this.inExecuteTask;
     }
+    
 
     render() {
         const { shelfs } = this.state;
         return (
             <div>
-                <div className="ui menu fixed inverted">
-                    <div className="ui three column stackable grid container" style={{ margin: 0 }}>
-                        <Link to='/' className="item three wide column">
-                            <Icon name='book' size='big' />
-                            MyReads
-                        </Link>
-                        <div className='item ten column right'>
-                            <Dimmer active={this.state.inLoading}>
-                                <Loader />
-                            </Dimmer>
-                        </div>
-                    </div>
-
-                </div>
+                <MyShelfsToolBar
+                    inExecuteTask={this.inExecuteTask} 
+                    selectedBooks={this.selectedBooks}
+                    listToShelf={this.listToShelf}
+                    sendCollectionToShelf={this.sendCollectionToShelf} />
                 <div className="list-books">
                     <div className="list-books-content">
                         <BookCollectionEvents changeShelf={this.changeShelf}>
                             {
                                 this.getShelfsList().map(shelf =>
                                     <BookShelf
-                                        blocked={this.blockShelf(shelf)}                                        
+                                        blocked={this.blockShelf(shelf)}
                                         key={shelf}
                                         shelf={shelfs[shelf]} />)
                             }
