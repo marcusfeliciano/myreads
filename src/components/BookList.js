@@ -1,5 +1,6 @@
 import React from 'react';
 import CardBook from './CardBook';
+import PropTypes from 'prop-types';
 
 const BookList = (props) => {
     return (
@@ -14,8 +15,10 @@ const BookList = (props) => {
             </ol>
         </div>
     );
+}
 
-
+BookList.propTypes = {
+    collection: PropTypes.array
 }
 
 export default BookList;

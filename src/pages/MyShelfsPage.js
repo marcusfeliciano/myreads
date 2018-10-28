@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Icon, Loader, Dimmer, Dropdown } from 'semantic-ui-react';
+import { Button } from 'semantic-ui-react';
 import BookShelf from '../components/BookShelf';
 import BookCollectionEvents from '../components/BookCollectionEvents';
-import MyShelfsToolBar from '../components/MyShelfsToolBar';
+import MyShelfsToolbar from '../components/MyShelfsToolbar';
 
 import { AppChanels, AppEvents } from '../App';
 import PubSub from 'pubsub-js';
@@ -111,7 +111,7 @@ class MyShelfsPage extends Component {
         const { shelfs } = this.state;
         return (
             <div>
-                <MyShelfsToolBar
+                <MyShelfsToolbar
                     inExecuteTask={this.inExecuteTask} 
                     selectedBooks={this.selectedBooks}
                     listToShelf={this.listToShelf}

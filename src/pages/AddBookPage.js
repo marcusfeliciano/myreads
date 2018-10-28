@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { Dimmer, Loader, Segment, Icon } from 'semantic-ui-react';
+import { withRouter } from 'react-router-dom';
+import { Dimmer, Loader, Segment } from 'semantic-ui-react';
 
 import * as BooksService from '../services/BooksService';
-import Search from '../components/Search';
 import CardBook from '../components/CardBook';
-import SendCollectToShelf from '../components/SendCollectToShelf';
 import BookCollectionEvents from '../components/BookCollectionEvents';
+import AddBookToolbar from '../components/AddBookToolbar';
 
 import { AppChanels } from '../App';
 import PubSub from 'pubsub-js';
@@ -18,7 +17,7 @@ class AddBookPage extends Component {
 
     state = {
         search: '',
-        isSearching: false,
+        inExecuteTask: false,
         selectedBooks: [],
         results: []
     }
@@ -40,8 +39,8 @@ class AddBookPage extends Component {
     setResultList = (list) => {
         this.setState((prev) => ({ results: list }));
     }
-    setSearchingLoader = (searching) => {
-        this.setState((prev) => ({ isSearching: searching }));
+    set inExecuteTask(inExecuteTask) {
+        this.setState((prev) => ({ inExecuteTask: inExecuteTask }));
     }
 
     request = (query) => {
@@ -51,35 +50,41 @@ class AddBookPage extends Component {
     }
 
 
-    get isSearching() {
-        return this.state.isSearching;
+    get inExecuteTask() {
+        return this.state.inExecuteTask;
     }
     get hasSelectedBooks() {
         return this.state.selectedBooks.length !== 0;
     }
 
     changeShelf = (book, shelf) => {
-        this.executeTaskWithLoading(BooksService.changeShelf(book, shelf));
+        this.executeTaskWithLoading(BooksService.changeShelf(book, shelf))
+            .then(() => {
+                this.props.history.push('/');
+            });
     }
 
     sendCollectionToShelf = (shelf) => {
-        this.executeTaskWithLoading(BooksService.addBooksCollectionToShelf(this.state.selectedBooks, shelf));
+        this.executeTaskWithLoading(BooksService.addBooksCollectionToShelf(this.state.selectedBooks, shelf))
+            .then(() => {
+                this.props.history.push('/');
+            });
     }
 
     /**
      * show loading when execute some task
      */
     executeTaskWithLoading = (promise) => {
-        this.setSearchingLoader(true);
+        this.inExecuteTask = true;
         return new Promise((resolve, reject) => {
             promise.then((result) => {
-                this.setSearchingLoader(false);
+                this.inExecuteTask = false;
                 resolve(result);
             }).catch(err => {
-                this.setSearchingLoader(false);
+                this.inExecuteTask = false;
                 reject(err);
             });
-        })
+        });
 
     }
 
@@ -88,31 +93,16 @@ class AddBookPage extends Component {
 
         return (
             <div className="search-books">
-                <div className="ui menu fixed inverted">
-                    <div className="ui three column stackable grid container" style={{ margin: 0 }}>
-                        <Link to='/' className="item three wide column">
-                            <Icon name='book' size='big' />
-                            MyReads
-                        </Link>
-                        {
-                        (!this.hasSelectedBooks && (
-                            <Search loading={this.state.isSearching} onSearch={(query) => this.request(query)} />
-                        ))
-                        }
-                        {
-                            (this.hasSelectedBooks && (
-                                <SendCollectToShelf
-                                    onSelectShelf={this.sendCollectionToShelf}
-                                    selectedBooks={this.state.selectedBooks} />
-                            ))
-                        }                        
-                    </div>
-                   
-                </div>
-
+                <AddBookToolbar
+                    inExecuteTask={this.state.inExecuteTask} 
+                    onSearch={this.request}
+                    selectedBooks={this.state.selectedBooks}
+                 />
+               
                 <div className="search-books-results">
+                    {(this.state.results.length !== 0 && (
                     <Segment>
-                        <Dimmer active={this.isSearching}>
+                        <Dimmer active={this.inExecuteTask}>
                             <Loader />
                         </Dimmer>
                         <BookCollectionEvents changeShelf={this.changeShelf}>
@@ -126,6 +116,7 @@ class AddBookPage extends Component {
                             </ol>
                         </BookCollectionEvents>
                     </Segment>
+                    ))}
                 </div>
 
             </div>
@@ -134,4 +125,4 @@ class AddBookPage extends Component {
 }
 
 
-export default AddBookPage;
+export default withRouter(AddBookPage);

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Dropdown } from 'semantic-ui-react';
 import PubSub from 'pubsub-js';
 import { AppChanels, AppEvents } from '../App';
+import PropTypes from 'prop-types';
 
 const values = [
     //{'key':'move', 'value': 'Move to...', 'text': 'Move to...'},
@@ -10,6 +11,11 @@ const values = [
     {'key':'read', 'value': 'read', 'text': 'Read'}
 ];
 class BookShelfChooser extends Component {
+    
+    static propTypes = {
+        book: PropTypes.object
+    }
+
     bookChanelToken = null
     state = {
         value:''

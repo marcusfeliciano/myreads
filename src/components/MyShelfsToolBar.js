@@ -1,8 +1,16 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, Dimmer, Loader, Dropdown } from 'semantic-ui-react';
+import PropTypes from 'prop-types';
 
-class MyShelfsToolBar extends Component {
+class MyShelfsToolbar extends Component {
+    static propTypes = {
+        selectedBooks: PropTypes.array,
+        listToShelf:  PropTypes.array,
+        sendCollectionToShelf: PropTypes.func,
+        inExecuteTask: PropTypes.bool
+    }
+
     state = {
         toShelfValue: ''
     }
@@ -12,7 +20,7 @@ class MyShelfsToolBar extends Component {
                 <div className="ui three column stackable grid container" style={{ margin: 0 }}>
                     <Link to='/' className="item three wide column">
                         <Icon name='book' size='big' />
-                        MyReads {this.props.selectedBooks.length}
+                        MyReads
                     </Link>
                     {(this.props.selectedBooks.length && (
                         <React.Fragment>
@@ -41,4 +49,4 @@ class MyShelfsToolBar extends Component {
     }
 }
 
-export default MyShelfsToolBar;
+export default MyShelfsToolbar;

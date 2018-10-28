@@ -3,10 +3,17 @@ import { Card, Image, Checkbox, Grid, Dimmer, Loader } from 'semantic-ui-react';
 import BookShelfChooser from './BookShelfChooser';
 import PubSub from 'pubsub-js';
 import { AppChanels, AppEvents } from '../App';
+import PropTypes from 'prop-types';
 
 class CardBook extends Component {
+
+    static propTypes = {
+        book: PropTypes.object
+    }
+    
     bookChanelToken = null;
     bookCollectChanelToken = null;
+
     
     state = {
         loading: false,
