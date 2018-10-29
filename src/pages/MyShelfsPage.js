@@ -5,7 +5,7 @@ import BookShelf from '../components/BookShelf';
 import BookCollectionEvents from '../components/BookCollectionEvents';
 import MyShelfsToolbar from '../components/MyShelfsToolbar';
 
-import { AppChanels, AppEvents } from '../App';
+import { AppChanels } from '../App';
 import PubSub from 'pubsub-js';
 
 import * as BooksService from '../services/BooksService';
@@ -13,74 +13,30 @@ import * as BooksService from '../services/BooksService';
 
 class MyShelfsPage extends Component {
 
+    bookCollectionToken = null;
+
     state = {
-        shelfs: {},
-        inExecuteTask: false,
-        selectedBooks: [],
+        selectedBooks: []
     }
 
-    componentDidMount() {
-        this.loadShelfs();
+    componentWillMount() {
         this.subscribeBookCollectionChanel();
     }
+
     componentWillUnmount() {
         PubSub.unsubscribe(this.bookCollectionToken);
     }
 
-    loadShelfs = () => {
-        this.executeTaskWithLoading(BooksService.shelfsWithBooks())
-            .then(shelfs => this.setState(() => ({ shelfs: shelfs }))
-            );
-    }
-
     subscribeBookCollectionChanel = () => {
         this.bookCollectionToken = PubSub.subscribe(AppChanels.BOOK_COLLECT_CHANEL, (chanel, event) => {
-            this.setState(() => ({ selectedBooks: event.bundle.selectedBooks }))
+          this.setState(() => ({ selectedBooks: event.bundle.selectedBooks }))
         });
-    }
+      }
 
-    changeShelf = (book, shelf) => {
-        this.executeTaskWithLoading(BooksService.changeShelf(book, shelf))
-            .then(() => this.loadShelfs());
-    }
-
-    sendCollectionToShelf = (e, { value }) => {
-        this.executeTaskWithLoading(BooksService.addBooksCollectionToShelf(this.state.selectedBooks, value))
-            .then(() => {
-                this.publishThatBooksHasBeenAdded();
-                this.loadShelfs();
-            });
-    }
-
-    publishThatBooksHasBeenAdded = () => {
-        PubSub.publish(AppChanels.BOOK_CHANEL,{
-            type: AppEvents.BOOK_ADDED, bundle: {}
-        });
-    }
-
-    /**
-     * show loading when execute some task
-     */
-    executeTaskWithLoading = (promise) => {
-        this.inExecuteTask = true;
-        return new Promise((resolve, reject) => {
-            promise.then((result) => {
-                this.inExecuteTask = false;
-                resolve(result);
-            }).catch(err => {
-                this.inExecuteTask = false;
-                reject(err);
-            });
-        })
-
-    }
     get selectedBooks() {
         return this.state.selectedBooks;
     }
-    get inExecuteTask() {
-        return this.state.inExecuteTask;
-    }
-
+    
     get hasSelectedBooks() {
         return this.state.selectedBooks.length !== 0;
     }
@@ -93,34 +49,31 @@ class MyShelfsPage extends Component {
         return BooksService.SHELF_LIST.filter(i => i.value !== shelf);
     }
 
-    set inExecuteTask(state){
-        this.setState(() => ({ inExecuteTask: state }))
-    }
-
-    getShelfsList = () => {
-        return Object.keys(this.state.shelfs)
+    get getShelfsList() {
+        return Object.keys(this.props.shelfs)
     }
 
     blockShelf = (shelf) => {
         const { selectedBooks } = this.state;
-        return (selectedBooks.length && selectedBooks[0].shelf !== shelf) || this.inExecuteTask;
+        return (selectedBooks.length && selectedBooks[0].shelf !== shelf) || this.props.inExecuteTask;
     }
     
 
     render() {
-        const { shelfs } = this.state;
+        const { shelfs, inExecuteTask, changeShelf, sendCollectionToShelf } = this.props;
+        
         return (
             <div>
                 <MyShelfsToolbar
-                    inExecuteTask={this.inExecuteTask} 
+                    inExecuteTask={inExecuteTask} 
                     selectedBooks={this.selectedBooks}
                     listToShelf={this.listToShelf}
-                    sendCollectionToShelf={this.sendCollectionToShelf} />
+                    sendCollectionToShelf={(e, {value})=> sendCollectionToShelf(this.state.selectedBooks, value)} />
                 <div className="list-books">
                     <div className="list-books-content">
-                        <BookCollectionEvents changeShelf={this.changeShelf}>
+                        <BookCollectionEvents changeShelf={changeShelf}>
                             {
-                                this.getShelfsList().map(shelf =>
+                                this.getShelfsList.map(shelf =>
                                     <BookShelf
                                         blocked={this.blockShelf(shelf)}
                                         key={shelf}

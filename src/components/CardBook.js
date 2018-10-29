@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Card, Image, Checkbox, Grid, Dimmer, Loader } from 'semantic-ui-react';
 import BookShelfChooser from './BookShelfChooser';
 import PubSub from 'pubsub-js';
-import { AppChanels, AppEvents } from '../App';
+import { AppChanels, AppEvents, SHELFS } from '../App';
 import PropTypes from 'prop-types';
 
 class CardBook extends Component {
@@ -91,6 +91,9 @@ class CardBook extends Component {
             ? `${description.substr(0, 150)}...`
             : description
     }
+    get formatedShelf() {        
+        return SHELFS.filter(shelf=> shelf.key === this.book.shelf)[0].text
+    }
     get hasBookSelected() {
         return this.state.hasBookSelected;
     }
@@ -108,8 +111,9 @@ class CardBook extends Component {
                     <Image floated='left' rounded src={this.image} style={{ width: 128, height: 193 }} />
                     <Card.Header style={{ fontSize: 14 }}>{this.formatedTitle}</Card.Header>
                     <Card.Meta>{this.bookAuthors}</Card.Meta>
+                    <span className="ui olive label mini">{this.formatedShelf}</span>
                 </Card.Content>
-                <Card.Content extra>
+                <Card.Content extra>                    
                     <Grid columns='1'>
                         <Grid.Row>
                             <Grid.Column>

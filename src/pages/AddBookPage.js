@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Dimmer, Loader, Segment } from 'semantic-ui-react';
 
-import * as BooksService from '../services/BooksService';
 import CardBook from '../components/CardBook';
 import BookCollectionEvents from '../components/BookCollectionEvents';
 import AddBookToolbar from '../components/AddBookToolbar';
@@ -17,9 +16,7 @@ class AddBookPage extends Component {
 
     state = {
         search: '',
-        inExecuteTask: false,
-        selectedBooks: [],
-        results: []
+        selectedBooks: []
     }
 
     componentDidMount = () => {
@@ -36,86 +33,70 @@ class AddBookPage extends Component {
         PubSub.unsubscribe(this.bookCollectionToken);
     }
 
-    setResultList = (list) => {
-        this.setState((prev) => ({ results: list }));
-    }
-    set inExecuteTask(inExecuteTask) {
-        this.setState((prev) => ({ inExecuteTask: inExecuteTask }));
-    }
-
-    request = (query) => {
-        this.executeTaskWithLoading(BooksService.search(query))
-            .then(books => this.setResultList(books))
-            .catch(() => this.setResultList([]));
+    sendCollectionToShelf = (event, { value }) => {
+        this.props.sendCollectionToShelf(this.state.selectedBooks, value);
+        this.props.history.push('/');
+        this.props.searchBooks('');
     }
 
-
-    get inExecuteTask() {
-        return this.state.inExecuteTask;
+    changeShelf = (book, shelf) => {
+        this.props.changeShelf(book, shelf);
+        this.props.history.push('/');
+        this.props.searchBooks('');
     }
+
+    formatedID(book) {        
+        return [book.id, '-', book.shelf].join('');
+    }
+
     get hasSelectedBooks() {
         return this.state.selectedBooks.length !== 0;
     }
 
-    changeShelf = (book, shelf) => {
-        this.executeTaskWithLoading(BooksService.changeShelf(book, shelf))
-            .then(() => {
-                this.props.history.push('/');
+    get bookSearchResultWithShelf() {
+        
+        const { bookSearchResult, shelfs } = this.props;
+        return bookSearchResult.map( book => {            
+            var shelfBook = 'none';
+            Object.keys(shelfs).forEach(shelf => {
+                shelfs[shelf].books.forEach(shelfBookObject => {                    
+                    if (shelfBookObject.id === book.id) {
+                        shelfBook = shelf;                        
+                    }
+                });
             });
-    }
-
-    sendCollectionToShelf = (shelf) => {
-        this.executeTaskWithLoading(BooksService.addBooksCollectionToShelf(this.state.selectedBooks, shelf))
-            .then(() => {
-                this.props.history.push('/');
-            });
-    }
-
-    /**
-     * show loading when execute some task
-     */
-    executeTaskWithLoading = (promise) => {
-        this.inExecuteTask = true;
-        return new Promise((resolve, reject) => {
-            promise.then((result) => {
-                this.inExecuteTask = false;
-                resolve(result);
-            }).catch(err => {
-                this.inExecuteTask = false;
-                reject(err);
-            });
+            return Object.assign({shelf:shelfBook}, book);
         });
-
     }
-
 
     render() {
-
+        const { inExecuteTask, bookSearchResult, searchBooks } = this.props;
+        const { selectedBooks } = this.state;
         return (
             <div className="search-books">
                 <AddBookToolbar
-                    inExecuteTask={this.state.inExecuteTask} 
-                    onSearch={this.request}
-                    selectedBooks={this.state.selectedBooks}
-                 />
-               
+                    inExecuteTask={inExecuteTask}
+                    onSearch={searchBooks}
+                    sendCollectionToShelf={this.sendCollectionToShelf}
+                    selectedBooks={selectedBooks}
+                />
+
                 <div className="search-books-results">
-                    {(this.state.results.length !== 0 && (
-                    <Segment>
-                        <Dimmer active={this.inExecuteTask}>
-                            <Loader />
-                        </Dimmer>
-                        <BookCollectionEvents changeShelf={this.changeShelf}>
-                            <ol className="books-grid">
-                                {this.state.results.map(book =>
-                                    <li key={book.id}>
-                                        <CardBook
-                                            book={book} />
-                                    </li>
-                                )}
-                            </ol>
-                        </BookCollectionEvents>
-                    </Segment>
+                    {(bookSearchResult.length !== 0 && (
+                        <Segment>
+                            <Dimmer active={inExecuteTask}>
+                                <Loader />
+                            </Dimmer>
+                            <BookCollectionEvents changeShelf={this.changeShelf}>
+                                <ol className="books-grid">
+                                    {this.bookSearchResultWithShelf.map(book =>
+                                        <li key={this.formatedID(book)}>
+                                            <CardBook book={book} />
+                                        </li>
+                                    )}
+                                </ol>
+                            </BookCollectionEvents>
+                        </Segment>
                     ))}
                 </div>
 

@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+import { Input, Dimmer, Loader,  Icon, Select } from 'semantic-ui-react';
 
-import { Input, Dimmer, Loader, Select } from 'semantic-ui-react';
-import IconToolbar from './toolbar/IconToolbar';
-import * as BooksService from '../services/BooksService';
+
 import PropTypes from 'prop-types';
 
-class AddBookToolbar extends Component {
+class Toolbar extends Component {
     static propTypes = {
         inExecuteTask: PropTypes.bool,
         onSearch: PropTypes.func,
@@ -43,23 +43,24 @@ class AddBookToolbar extends Component {
     }
 
     render() {
-        const {inExecuteTask} = this.props;
+        const { selectedBooks, shelfOptions, icon, inExecuteTask, sendCollectionToShelf, toLink } = this.props;
         return (
             <div className="ui menu fixed inverted">
                 <div className="ui three column stackable grid container" style={{ margin: 0 }}>
-                    <IconToolbar 
-                        toLink='/'
-                        icon='angle left' />
+                    <Link to={toLink} className="item three wide column">
+                        <Icon name={icon} size='big' />
+                        MyReads
+                    </Link>
                     {(this.props.selectedBooks.length && (
                         <React.Fragment>
                             <div className="item eight wide column">
-                                <h3>{`Total of selected books ${this.props.selectedBooks.length}`}</h3>
+                                <h3>{`Total of selected books ${selectedBooks.length}`}</h3>
                             </div>
                             <div className="item five wide column">                                
                                 <Select placeholder='Send to...'
-                                    options={BooksService.SHELF_LIST}
+                                    options={shelfOptions}
                                     value={this.state.value}
-                                    onChange={this.props.sendCollectionToShelf} />
+                                    onChange={sendCollectionToShelf} />
                             </div>
                         </React.Fragment>
                     ))}
@@ -87,4 +88,4 @@ class AddBookToolbar extends Component {
     }
 }
 
-export default AddBookToolbar;
+export default Toolbar;

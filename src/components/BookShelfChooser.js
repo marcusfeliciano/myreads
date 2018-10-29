@@ -1,15 +1,10 @@
 import React, { Component } from 'react';
-import { Dropdown } from 'semantic-ui-react';
+import { Dropdown, Select } from 'semantic-ui-react';
 import PubSub from 'pubsub-js';
-import { AppChanels, AppEvents } from '../App';
+import { AppChanels, AppEvents, SHELFS } from '../App';
 import PropTypes from 'prop-types';
 
-const values = [
-    //{'key':'move', 'value': 'Move to...', 'text': 'Move to...'},
-    {'key':'currentlyReading', 'value': 'currentlyReading', 'text': 'Currently Reading'},
-    {'key':'wantToRead', 'value': 'wantToRead', 'text': 'Want to Read'},
-    {'key':'read', 'value': 'read', 'text': 'Read'}
-];
+
 class BookShelfChooser extends Component {
     
     static propTypes = {
@@ -22,11 +17,10 @@ class BookShelfChooser extends Component {
     }
     componentDidMount = () => {
         const { book } = this.props;
-        if(book && book.hasOwnProperty('shelf')){
-            this.setState(() => ({
-                value:book.shelf
-            })) 
-        }
+        const shelf = book && book.hasOwnProperty('shelf') 
+        ? book.shelf
+        : 'none';
+        this.setState(() => ({value:shelf})) 
         this.bookChanelToken = PubSub.subscribe(AppChanels.BOOK_CHANEL, this.subscribeBookChanel)
     }
 
@@ -50,19 +44,21 @@ class BookShelfChooser extends Component {
     }
 
     onChange = (e, { value }) => {
-        this.setState(()=>({
+
+        this.setState((prev)=>({
             value : value
         }))
-        
-        PubSub.publish(AppChanels.SHELF_CHANEL, this.getEventBundle(value));
+        if(value !== this.state.value){
+            PubSub.publish(AppChanels.SHELF_CHANEL, this.getEventBundle(value));
+        }
     }
     
     render() {
         return (
             <div>
-                <Dropdown placeholder='Move to...' 
+                <Select placeholder='Move to...' 
                     fluid 
-                    options={values}
+                    options={SHELFS}
                     value={this.state.value} 
                     onChange={this.onChange} />
             </div>
