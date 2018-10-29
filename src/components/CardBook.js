@@ -67,7 +67,11 @@ class CardBook extends Component {
     }
 
     get formatedTitle() {
-        return `${this.book.title} - ${this.book.subtitle}`;
+        const title = this.book.title || 'no title';
+        const subtitle = this.book.subtitle ? 
+            ` - ${this.book.subtitle}`
+            : '';
+        return `${title}${subtitle}`;
     }
 
     get bookAuthors() {
