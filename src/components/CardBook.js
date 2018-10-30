@@ -1,10 +1,16 @@
 import React, { Component } from 'react';
-import { Card, Image, Checkbox, Grid, Dimmer, Loader } from 'semantic-ui-react';
+import { Card, Image, Checkbox, Grid, Dimmer, Loader, Label } from 'semantic-ui-react';
 import BookShelfChooser from './BookShelfChooser';
 import PubSub from 'pubsub-js';
 import { AppChanels, AppEvents, SHELFS } from '../App';
 import PropTypes from 'prop-types';
 
+const shelfLabelColors = {
+    none:'grey',
+    currentlyReading:'orange',
+    wantToRead:'violet',
+    read:'olive'
+}
 class CardBook extends Component {
 
     static propTypes = {
@@ -79,8 +85,10 @@ class CardBook extends Component {
             ? this.book.authors.join(', ')
             : ' - ';
     }
-    get image() {
-        return this.book.imageLinks.thumbnail;
+    get image() {        
+        return this.book.hasOwnProperty('imageLinks') 
+        ? this.book.imageLinks.thumbnail 
+        : 'images/square-image.png';
     }
     get description() {
         const { description } = this.book;
@@ -92,7 +100,10 @@ class CardBook extends Component {
             : description
     }
     get formatedShelf() {        
-        return SHELFS.filter(shelf=> shelf.key === this.book.shelf)[0].text
+        return `Shelf: ${SHELFS.filter(shelf=> shelf.key === this.book.shelf)[0].text}`
+    }
+    get shelfLabelColor() {
+        return `ui label mini ${shelfLabelColors[this.book.shelf]}`;
     }
     get hasBookSelected() {
         return this.state.hasBookSelected;
@@ -111,7 +122,7 @@ class CardBook extends Component {
                     <Image floated='left' rounded src={this.image} style={{ width: 128, height: 193 }} />
                     <Card.Header style={{ fontSize: 14 }}>{this.formatedTitle}</Card.Header>
                     <Card.Meta>{this.bookAuthors}</Card.Meta>
-                    <span className="ui olive label mini">{this.formatedShelf}</span>
+                    <span className={this.shelfLabelColor}>{this.formatedShelf}</span>
                 </Card.Content>
                 <Card.Content extra>                    
                     <Grid columns='1'>
@@ -122,7 +133,7 @@ class CardBook extends Component {
                         </Grid.Row>
                         <Grid.Row>
                             <Grid.Column>
-                                <Checkbox label='Choose to send...' 
+                                <Checkbox label='Choose to collect and send to an shef' 
                                     checked={this.state.checked} onChange={this.selectBook} />
                             </Grid.Column>
                         </Grid.Row>

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Dimmer, Loader, Segment } from 'semantic-ui-react';
 
+
 import CardBook from '../components/CardBook';
 import BookCollectionEvents from '../components/BookCollectionEvents';
 import AddBookToolbar from '../components/AddBookToolbar';
@@ -44,7 +45,7 @@ class AddBookPage extends Component {
         this.props.history.push('/');
         this.props.searchBooks('');
     }
-
+    
     formatedID(book) {        
         return [book.id, '-', book.shelf].join('');
     }
@@ -52,14 +53,20 @@ class AddBookPage extends Component {
     get hasSelectedBooks() {
         return this.state.selectedBooks.length !== 0;
     }
-
+    /**
+     * This method gets a list of book come from search API 
+     * and verifys if the returned list already has books on shelf
+     * if its contains then the shelf name is added to abook
+     * to show on result list
+     */
     get bookSearchResultWithShelf() {
         
         const { bookSearchResult, shelfs } = this.props;
         return bookSearchResult.map( book => {            
             var shelfBook = 'none';
             Object.keys(shelfs).forEach(shelf => {
-                shelfs[shelf].books.forEach(shelfBookObject => {                    
+                shelfs[shelf].books.forEach(shelfBookObject => {
+                    // if found book add shelf name on it
                     if (shelfBookObject.id === book.id) {
                         shelfBook = shelf;                        
                     }
@@ -80,7 +87,6 @@ class AddBookPage extends Component {
                     sendCollectionToShelf={this.sendCollectionToShelf}
                     selectedBooks={selectedBooks}
                 />
-
                 <div className="search-books-results">
                     {(bookSearchResult.length !== 0 && (
                         <Segment>

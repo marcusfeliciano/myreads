@@ -6,9 +6,10 @@ const provider = () => {
 }
 export const SHELF_LIST = [
     //{'key':'move', 'value': 'Move to...', 'text': 'Move to...'},
-    {'key':'currentlyReading', 'value': 'currentlyReading', 'text': 'Currently Reading'},
-    {'key':'wantToRead', 'value': 'wantToRead', 'text': 'Want to Read'},
-    {'key':'read', 'value': 'read', 'text': 'Read'}
+    {key:'select', value: 'select', text: 'Select...', 'disabled':true},
+    {key:'currentlyReading', value: 'currentlyReading', text: 'Currently Reading'},
+    {key:'wantToRead', value: 'wantToRead', text: 'Want to Read'},
+    {key:'read', value: 'read', text: 'Read'}
 ];
 
 export const shelfsWithBooks = () => {

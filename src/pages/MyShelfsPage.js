@@ -68,7 +68,7 @@ class MyShelfsPage extends Component {
                     inExecuteTask={inExecuteTask} 
                     selectedBooks={this.selectedBooks}
                     listToShelf={this.listToShelf}
-                    sendCollectionToShelf={(e, {value})=> sendCollectionToShelf(this.state.selectedBooks, value)} />
+                    sendCollectionToShelf={sendCollectionToShelf} />
                 <div className="list-books">
                     <div className="list-books-content">
                         <BookCollectionEvents changeShelf={changeShelf}>

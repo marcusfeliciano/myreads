@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
+import { Input, Select } from 'semantic-ui-react';
+import Toolbar from './Toolbar';
 
-import { Input, Dimmer, Loader, Select } from 'semantic-ui-react';
-import IconToolbar from './toolbar/IconToolbar';
 import * as BooksService from '../services/BooksService';
 import PropTypes from 'prop-types';
 
@@ -18,8 +18,20 @@ class AddBookToolbar extends Component {
         search: ''
     }
 
+    get selectPlaceholder() {
+        return `Total of selected books ${this.props.selectedBooks.length}. Send to...`;
+    }
+
     get search() {
         return this.state.search;
+    }
+    /**
+     * clear search and return to main page
+     */
+    returnLink = (event, history) => {
+        event.preventDefault();
+        this.props.onSearch('');
+        history.push('/');
     }
 
     onChangeText = (event) => {
@@ -43,46 +55,25 @@ class AddBookToolbar extends Component {
     }
 
     render() {
-        const {inExecuteTask} = this.props;
+        const { inExecuteTask, selectedBooks } = this.props;
         return (
-            <div className="ui menu fixed inverted">
-                <div className="ui three column stackable grid container" style={{ margin: 0 }}>
-                    <IconToolbar 
-                        toLink='/'
-                        icon='angle left' />
-                    {(this.props.selectedBooks.length && (
-                        <React.Fragment>
-                            <div className="item eight wide column">
-                                <h3>{`Total of selected books ${this.props.selectedBooks.length}`}</h3>
-                            </div>
-                            <div className="item five wide column">                                
-                                <Select placeholder='Send to...'
-                                    options={BooksService.SHELF_LIST}
-                                    value={this.state.value}
-                                    onChange={this.props.sendCollectionToShelf} />
-                            </div>
-                        </React.Fragment>
-                    ))}
-                    {(!this.props.selectedBooks.length && (
-                        <React.Fragment>
-                            <div className="item nine wide column">
-                                <Input
-                                    size='big'
-                                    loading={inExecuteTask}
-                                    value={this.search}
-                                    onChange={this.onChangeText}
-                                    placeholder="Search by title or author" />
-                            </div>
-                            <div className="item three wide column">
-                                <Dimmer active={inExecuteTask}>
-                                    <Loader  />
-                                </Dimmer>
-                            </div>
-                        </React.Fragment>
-                    ))}                    
-                </div>
-
-            </div>
+            <Toolbar onIconClick={this.returnLink} icon='angle left' inExecuteTask={inExecuteTask} >                
+                {(selectedBooks.length === 0 && (
+                    <Input                        
+                        fluid
+                        value={this.search}
+                        onChange={this.onChangeText}
+                        placeholder="Search by title or author" />
+                ))}
+                {(selectedBooks.length !== 0 && (                                    
+                        <Select placeholder={this.selectPlaceholder}
+                            fluid
+                            closeOnChange
+                            options={BooksService.SHELF_LIST}
+                            value={this.state.value}
+                            onChange={this.props.sendCollectionToShelf} />
+                ))}
+            </Toolbar>
         );
     }
 }

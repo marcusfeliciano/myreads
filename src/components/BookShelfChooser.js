@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Dropdown, Select } from 'semantic-ui-react';
+import { Select } from 'semantic-ui-react';
 import PubSub from 'pubsub-js';
 import { AppChanels, AppEvents, SHELFS } from '../App';
 import PropTypes from 'prop-types';

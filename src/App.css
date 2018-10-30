@@ -168,3 +168,8 @@ body, .app {
 .ui.menu.fixed {
   z-index: 10000;
 }
+
+.link-button {
+  border: none;
+  cursor: pointer;
+}

@@ -36,9 +36,11 @@ class BooksApp extends Component {
     inExecuteTask: false
   }
 
-  componentWillMount = () => {
-    this.loadShelfs();    
-  }  
+  componentWillMount = () => {    
+    this.loadShelfs();
+  }
+
+  
 
   loadShelfs = () => {
     this.executeTaskWithLoading(BooksService.shelfsWithBooks()).then((shelfs) => {
